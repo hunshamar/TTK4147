@@ -15,7 +15,7 @@ void busy_wait_times(int s)
     }
 }
 
-void access_latency(void){
+void access_latency_rdtsc(void){
     for (int i = 0; i < 1000*1000*1000; ++i)
     {
         __rdtsc();
@@ -41,9 +41,10 @@ void estimate_rdtsc(void)
     */
 }
 
+/*
 void estimate_clock_gettime(void)
 {
-    unsigned int total
+    unsigned int total;
     struct timespec tp;
     clockid_t clk_id = CLOCK_MONOTONIC;
     long int n = 10*1000*1000;
@@ -51,10 +52,39 @@ void estimate_clock_gettime(void)
     {
         int tick = clock_gettime(clk_id, &tp);
         int tock = clock_gettime(clk_id, &tp);
-        total+= (tick - tock)
+        total+= (tick - tock);
     }
-    printf("avg. time between measurements: %fl", double)
+}*/
+
+void access_latency_times(){
+    struct tms buff;
+    for (int i = 0; i < 1000*1000; ++i)
+    {
+        times(&buff);
+    }
+    /*
+        1 million measurements takes 0.468 seconds. Meaning that the access time is 468 ns
+    */
 }
+
+void estimated_resolution_times()
+{
+    struct tms buf;
+    long int n = 1*1000*1000;
+    unsigned int total = 0;
+    for (int i = 0; i < n; ++i)
+    {
+        unsigned long long tick = times(&buf);
+        unsigned long long tock = times(&buf);
+        printf("Tick: %lld, Tock: %lld \n \n", tick, tock);
+        total += (tock - tick);
+    }
+    printf("avg. ticks used for rdtsc: %fl \n", (double)(total)/(double)n);
+    /*
+        Avr ticks = 22.9 
+    */   
+}
+
 
 int main(void)
 {
@@ -75,10 +105,12 @@ int main(void)
 
 
     //printf("After wait\n");
-    estimate_rdtsc();
+    //estimate_rdtsc();
     //access_latency();
+    printf("wtf\n");
+    //access_latency_times();
+    estimated_resolution_times();
 
-    
     return 0;
 }
 

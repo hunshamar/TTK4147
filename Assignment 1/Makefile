@@ -1,10 +1,10 @@
-SOURCE_FILES = main.c copyable-code.c
+SOURCE_FILES = main.c 
 
 #program executable name
 TARGET = time
 
 #compiler flags
-CFLAGS = -g -Wall -std=gnu11
+CFLAGS = -g -Wall -std=gnu11 
 
 #linker flags
 LDFLAGS = -g
