@@ -60,7 +60,24 @@ void estimate_clock_gettime(void)
     //about 23.3 ns avg.
 }
 
-
+void estimate_clock_gettime_latency(void)
+{
+    int n = 1000*1000*1000;
+    struct timespec start, finish, buf;
+    unsigned long int total_ns = 0;
+    clock_gettime(CLOCK_REALTIME, &start);
+    for (int i = 0; i < n; ++i)
+    {
+        clock_gettime(CLOCK_REALTIME, &buf);
+    }
+    clock_gettime(CLOCK_REALTIME, &finish);
+    long seconds = finish.tv_sec - start.tv_sec;
+    long ns = finish.tv_nsec - start.tv_nsec;
+    total_ns += (seconds * 1000*1000*1000);
+    total_ns += ns;
+    printf("clock_gettime avg. (ns) latency to measure: %fl \n \n", (double)total_ns/(double)n);
+    //about 22.4 ns latency
+}
 
 void access_latency_times(){
     struct tms buff;
@@ -92,6 +109,7 @@ void estimated_resolution_times()
 }
 
 
+
 int main(void)
 {
     //sleep(1);
@@ -114,7 +132,8 @@ int main(void)
     //estimate_rdtsc();
     //access_latency();
     //access_latency_times();
-    estimated_resolution_times();
+    //estimated_resolution_times();
+    //estimate_clock_gettime_latency();
 
     return 0;
 }
