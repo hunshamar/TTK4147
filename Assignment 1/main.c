@@ -27,7 +27,7 @@ void access_latency(void){
 
 void estimate_rdtsc(void)
 {
-    long int n = 10*1000*1000;
+    long long int n = 10*1000*1000;
     unsigned int total = 0;
     for (int i = 0; i < n; ++i)
     {
@@ -35,26 +35,32 @@ void estimate_rdtsc(void)
         unsigned long long tock = __rdtsc();
         total += (tock - tick);
     }
-    printf("avg. ticks used for rdtsc: %fl", (double)(total)/(double)n);
+    printf("avg. ticks used for rdtsc: %fl \n", (double)(total)/(double)n);
     /*
         Avr ticks = 22.9 
     */
 }
 
+
 void estimate_clock_gettime(void)
 {
-    unsigned int total
-    struct timespec tp;
-    clockid_t clk_id = CLOCK_MONOTONIC;
-    long int n = 10*1000*1000;
+    int n = 10*1000*1000;
+    struct timespec start, finish;
+    unsigned long int total_ns = 0;
     for (int i = 0; i < n; ++i)
     {
-        int tick = clock_gettime(clk_id, &tp);
-        int tock = clock_gettime(clk_id, &tp);
-        total+= (tick - tock)
+        clock_gettime(CLOCK_REALTIME, &start);
+        clock_gettime(CLOCK_REALTIME, &finish);
+        long seconds = finish.tv_sec - start.tv_sec;
+        long ns = finish.tv_nsec - start.tv_nsec;
+        total_ns += (seconds * 1000*1000*1000);
+        total_ns += ns;
     }
-    printf("avg. time between measurements: %fl", double)
+    printf("clock_gettime avg. time(ns) between measurements: %fl", (double)(total_ns)/(double)n);
+    //about 23.3 ns avg.
 }
+
+
 
 int main(void)
 {
@@ -75,9 +81,10 @@ int main(void)
 
 
     //printf("After wait\n");
-    estimate_rdtsc();
+    //estimate_rdtsc();
     //access_latency();
-
+    estimate_clock_gettime();
+    printf("\nhello\n");
     
     return 0;
 }
