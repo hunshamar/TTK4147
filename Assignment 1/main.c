@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "copyable-code.h"
-
+#include <sched.h>
 
 void busy_wait_times(int s)
 {
@@ -108,6 +108,22 @@ void estimated_resolution_times()
     */   
 }
 
+void context_switch()
+{
+
+    struct timespec start, finish;
+
+    clock_gettime(CLOCK_REALTIME, &start);
+    sched_yield();
+    clock_gettime(CLOCK_REALTIME, &finish);
+    long seconds = finish.tv_sec - start.tv_sec;
+    long ns = finish.tv_nsec - start.tv_nsec;
+
+    long int diff;   
+    
+    printf("Time to execute sched_yield() is %ld s and %d ns \n", seconds, ns);
+    //about 23.3 ns avg.
+}
 
 
 int main(void)
@@ -135,6 +151,7 @@ int main(void)
     //estimated_resolution_times();
     //estimate_clock_gettime_latency();
 
+    context_switch();
     return 0;
 }
 
