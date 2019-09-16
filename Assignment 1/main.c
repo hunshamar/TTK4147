@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "copyable-code.h"
-
+#include <sched.h>
 
 void busy_wait_times(int s)
 {
@@ -15,7 +15,7 @@ void busy_wait_times(int s)
     }
 }
 
-void access_latency(void){
+void access_latency_rdtsc(void){
     for (int i = 0; i < 1000*1000*1000; ++i)
     {
         __rdtsc();
@@ -27,7 +27,7 @@ void access_latency(void){
 
 void estimate_rdtsc(void)
 {
-    long int n = 10*1000*1000;
+    long long int n = 10*1000*1000;
     unsigned int total = 0;
     for (int i = 0; i < n; ++i)
     {
@@ -35,26 +35,96 @@ void estimate_rdtsc(void)
         unsigned long long tock = __rdtsc();
         total += (tock - tick);
     }
-    printf("avg. ticks used for rdtsc: %fl", (double)(total)/(double)n);
+    printf("avg. ticks used for rdtsc: %fl \n", (double)(total)/(double)n);
     /*
         Avr ticks = 22.9 
     */
 }
 
+
 void estimate_clock_gettime(void)
 {
-    unsigned int total
-    struct timespec tp;
-    clockid_t clk_id = CLOCK_MONOTONIC;
-    long int n = 10*1000*1000;
+    int n = 10*1000*1000;
+    struct timespec start, finish;
+    unsigned long int total_ns = 0;
     for (int i = 0; i < n; ++i)
     {
-        int tick = clock_gettime(clk_id, &tp);
-        int tock = clock_gettime(clk_id, &tp);
-        total+= (tick - tock)
+        clock_gettime(CLOCK_REALTIME, &start);
+        clock_gettime(CLOCK_REALTIME, &finish);
+        long seconds = finish.tv_sec - start.tv_sec;
+        long ns = finish.tv_nsec - start.tv_nsec;
+        total_ns += (seconds * 1000*1000*1000);
+        total_ns += ns;
     }
-    printf("avg. time between measurements: %fl", double)
+    printf("clock_gettime avg. time(ns) between measurements: %fl", (double)(total_ns)/(double)n);
+    //about 23.3 ns avg.
 }
+
+void estimate_clock_gettime_latency(void)
+{
+    int n = 1000*1000*1000;
+    struct timespec start, finish, buf;
+    unsigned long int total_ns = 0;
+    clock_gettime(CLOCK_REALTIME, &start);
+    for (int i = 0; i < n; ++i)
+    {
+        clock_gettime(CLOCK_REALTIME, &buf);
+    }
+    clock_gettime(CLOCK_REALTIME, &finish);
+    long seconds = finish.tv_sec - start.tv_sec;
+    long ns = finish.tv_nsec - start.tv_nsec;
+    total_ns += (seconds * 1000*1000*1000);
+    total_ns += ns;
+    printf("clock_gettime avg. (ns) latency to measure: %fl \n \n", (double)total_ns/(double)n);
+    //about 22.4 ns latency
+}
+
+void access_latency_times(){
+    struct tms buff;
+    for (int i = 0; i < 1000*1000; ++i)
+    {
+        times(&buff);
+    }
+    /*
+        1 million measurements takes 0.468 seconds. Meaning that the access time is 468 ns
+    */
+}
+
+void estimated_resolution_times()
+{
+    struct tms buf;
+    long int n = 1*1000*1000;
+    unsigned int total = 0;
+    for (int i = 0; i < n; ++i)
+    {
+        unsigned long long tick = times(&buf);
+        unsigned long long tock = times(&buf);
+        printf("Tick: %lld, Tock: %lld \n \n", tick, tock);
+        total += (tock - tick);
+    }
+    printf("avg. ticks used for rdtsc: %fl \n", (double)(total)/(double)n);
+    /*
+        Avr ticks = 22.9 
+    */   
+}
+
+void context_switch()
+{
+
+    struct timespec start, finish;
+
+    clock_gettime(CLOCK_REALTIME, &start);
+    sched_yield();
+    clock_gettime(CLOCK_REALTIME, &finish);
+    long seconds = finish.tv_sec - start.tv_sec;
+    long ns = finish.tv_nsec - start.tv_nsec;
+
+    long int diff;   
+    
+    printf("Time to execute sched_yield() is %ld s and %d ns \n", seconds, ns);
+    //about 23.3 ns avg.
+}
+
 
 int main(void)
 {
@@ -75,10 +145,13 @@ int main(void)
 
 
     //printf("After wait\n");
-    estimate_rdtsc();
+    //estimate_rdtsc();
     //access_latency();
+    //access_latency_times();
+    //estimated_resolution_times();
+    //estimate_clock_gettime_latency();
 
-    
+    context_switch();
     return 0;
 }
 
