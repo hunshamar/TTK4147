@@ -24,6 +24,7 @@ void memset_eight_gigs(void) //segfault
     long** matrix = malloc(y_dim * sizeof(long*));
     for (long y = 0; y < y_dim; ++y)
     {
+        matrix[y] = malloc(x_dim*sizeof(long));
         memset(matrix[y], 0, x_dim*sizeof(long));
     }
     //difference between memory and swap is that the swap memory is a partition in the secondary memory.
@@ -32,7 +33,7 @@ void memset_eight_gigs(void) //segfault
 int main(void)
 {
     //alloc_eight_gigs();
-    //memset_eight_gigs();
+    memset_eight_gigs();
 
     return 0;
 }

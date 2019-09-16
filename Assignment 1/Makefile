@@ -1,4 +1,4 @@
-SOURCE_FILES = main.c 
+SOURCE_FILES = main.c copyable-code.c
 
 #program executable name
 TARGET = time
@@ -7,7 +7,10 @@ TARGET = time
 CFLAGS = -g -Wall -std=gnu11 
 
 #linker flags
-LDFLAGS = -g
+LDFLAGS = -g 
+
+#end flags
+ENDFLAGS = -lm
 
 #list of sources
 #SOURCES = $( "*.c")
@@ -20,7 +23,7 @@ OBJECTS = $(SOURCE_FILES:.c=.o)
 
 #link programs
 $(TARGET): $(OBJECTS)
-	gcc $(LDFLAGS) -o $@ $^
+	gcc $(LDFLAGS) -o $@ $^ $(ENDFLAGS)
 
 #compile 
 %.o : %.c

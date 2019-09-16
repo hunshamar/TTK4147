@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include "copyable-code.h"
 #include <sched.h>
+#include <math.h>
 
 void busy_wait_times(int s)
 {
@@ -25,59 +26,97 @@ void access_latency_rdtsc(void){
     */
 }
 
-void estimate_rdtsc(void)
+void estimate_rdtsc_res(void)
 {
+    int ns_max = 50;
+    int histogram[ns_max];
+    memset(histogram, 0, sizeof(int)*ns_max);
+
+
+
     long long int n = 10*1000*1000;
     unsigned int total = 0;
     for (int i = 0; i < n; ++i)
     {
         unsigned long long tick = __rdtsc();
         unsigned long long tock = __rdtsc();
-        total += (tock - tick);
-    }
-    printf("avg. ticks used for rdtsc: %fl \n", (double)(total)/(double)n);
+        int ns = (int)floor((double)(tock - tick) / 2.66);
+
+        if (ns >= 0 && ns < ns_max){  
+            histogram[ns]++;
+        }
+    } 
     /*
         Avr ticks = 22.9 
     */
+
+   for (int i = 0; i < ns_max; i++){
+       printf("%d\n", histogram[i]);
+   }
+
+
+   return  (double)(total)/(double)n;
 }
 
 
-void estimate_clock_gettime(void)
+void estimate_clock_gettime_res(void)
 {
+
+
+
+    int ns_max = 50;
+    int histogram[ns_max];
+    memset(histogram, 0, sizeof(int)*ns_max);
+
     int n = 10*1000*1000;
     struct timespec start, finish;
-    unsigned long int total_ns = 0;
     for (int i = 0; i < n; ++i)
     {
         clock_gettime(CLOCK_REALTIME, &start);
         clock_gettime(CLOCK_REALTIME, &finish);
-        long seconds = finish.tv_sec - start.tv_sec;
         long ns = finish.tv_nsec - start.tv_nsec;
-        total_ns += (seconds * 1000*1000*1000);
-        total_ns += ns;
+
+        
+        if (ns >= 0 && ns < ns_max){  
+            histogram[ns]++;
+        }
+        
     }
-    printf("clock_gettime avg. time(ns) between measurements: %fl", (double)(total_ns)/(double)n);
+
+    for (int i = 0; i < ns_max; i++){
+        printf("%d\n", histogram[i]);
+    }
+
+
+    
     //about 23.3 ns avg.
 }
 
-void estimate_clock_gettime_latency(void)
-{
-    int n = 1000*1000*1000;
-    struct timespec start, finish, buf;
-    unsigned long int total_ns = 0;
-    clock_gettime(CLOCK_REALTIME, &start);
-    for (int i = 0; i < n; ++i)
-    {
-        clock_gettime(CLOCK_REALTIME, &buf);
-    }
-    clock_gettime(CLOCK_REALTIME, &finish);
-    long seconds = finish.tv_sec - start.tv_sec;
-    long ns = finish.tv_nsec - start.tv_nsec;
-    total_ns += (seconds * 1000*1000*1000);
-    total_ns += ns;
-    printf("clock_gettime avg. (ns) latency to measure: %fl \n \n", (double)total_ns/(double)n);
-    //about 22.4 ns latency
-}
+// void estimate_clock_gettime_res(void)
+// {
+
+    
+
+
+//     int n = 1*1000*1000;
+//     struct timespec start, finish, buf;
+//     unsigned long int total_ns = 0;
+//     clock_gettime(CLOCK_REALTIME, &start);
+//     for (int i = 0; i < n; ++i)
+//     {
+//         clock_gettime(CLOCK_REALTIME, &buf);
+//     }
+//     clock_gettime(CLOCK_REALTIME, &finish);
+//     long seconds = finish.tv_sec - start.tv_sec;
+//     long ns = finish.tv_nsec - start.tv_nsec;
+//     total_ns += (seconds * 1000*1000*1000);
+//     total_ns += ns;
+//     printf("clock_gettime avg. (ns) latency to measure: %fl \n ", (double)total_ns/(double)n);
+//     //about 22.4 ns latency
+//     return (double)total_ns/(double)n;
+// }
+
+
 
 void access_latency_times(){
     struct tms buff;
@@ -90,58 +129,88 @@ void access_latency_times(){
     */
 }
 
-void estimated_resolution_times()
+int estimated_resolution_times()
 {
+
+
+    int ns_max = 50;
+    int histogram[ns_max];
+    memset(histogram, 0, sizeof(int)*ns_max);
+
+
     struct tms buf;
-    long int n = 1*1000*1000;
+    long int n = 10*1000*1000;
     unsigned int total = 0;
     for (int i = 0; i < n; ++i)
     {
-        unsigned long long tick = times(&buf);
-        unsigned long long tock = times(&buf);
-        printf("Tick: %lld, Tock: %lld \n \n", tick, tock);
-        total += (tock - tick);
+        unsigned long long tick_ns = times(&buf);
+        unsigned long long tock_ns = times(&buf);
+        // printf("Tick: %ld, tock: %ld \n", tick_ns, tock_ns);
+        // sleep(1);
+        int ns = (tock_ns - tick_ns);
+
+        if (ns >= 0 && ns < ns_max){  
+            histogram[ns]++;
+        }
+
+
+
     }
-    printf("avg. ticks used for rdtsc: %fl \n", (double)(total)/(double)n);
-    /*
-        Avr ticks = 22.9 
-    */   
+    for (int i = 0; i < ns_max; i++){
+        printf("%d\n", histogram[i]);
+    }
+    
+   return (double)(total)/(double)n*10*1000*1000;
 }
 
 void context_switch()
 {
 
-    struct timespec start, finish;
-
-    clock_gettime(CLOCK_REALTIME, &start);
-    sched_yield();
-    clock_gettime(CLOCK_REALTIME, &finish);
-    long seconds = finish.tv_sec - start.tv_sec;
-    long ns = finish.tv_nsec - start.tv_nsec;
-
-    long int diff;   
     
-    printf("Time to execute sched_yield() is %ld s and %d ns \n", seconds, ns);
+    int ns_max = 500;
+    int histogram[ns_max];
+    memset(histogram, 0, sizeof(int)*ns_max);
+
+
+    long int n = 1000*1000;
+    for (int i = 0; i < n; ++i){
+        
+        struct timespec start, finish;
+
+        clock_gettime(CLOCK_REALTIME, &start);
+        sched_yield();
+        clock_gettime(CLOCK_REALTIME, &finish);
+        long seconds = finish.tv_sec - start.tv_sec;
+        long ns = finish.tv_nsec - start.tv_nsec;
+         if (ns >= 0 && ns < ns_max){  
+            histogram[ns]++;
+        }
+    }
+    for (int i = 0; i < ns_max; i++){
+        printf("%d\n", histogram[i]);
+    }
+
+    
     //about 23.3 ns avg.
 }
 
 
 int main(void)
 {
-    //sleep(1);
-    
+    //sleep(1);  // 1.001s real, reesten 0
+      
 
-    /*
+    /*    
     struct timespec t;
     t.tv_sec = 1;
 
-    busy_wait(t);
+    busy_wait(t); // real 1.001, sys 1.000
     */
 
 
     //printf("Before wait\n");
 
-    //busy_wait_times(1);
+    //busy_wait_times(1); // real 1.003, sys 1.000
 
 
     //printf("After wait\n");
@@ -151,7 +220,15 @@ int main(void)
     //estimated_resolution_times();
     //estimate_clock_gettime_latency();
 
+
+
+    //estimate_rdtsc_res();
+    //estimate_clock_gettime_res();
+    //estimated_resolution_times();
+
+
     context_switch();
+
     return 0;
 }
 
