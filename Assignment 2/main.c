@@ -33,7 +33,7 @@ void memset_eight_gigs(void) //segfault
 int main(void)
 {
     //alloc_eight_gigs();
-    memset_eight_gigs();
+    //memset_eight_gigs();
 
     return 0;
 }
