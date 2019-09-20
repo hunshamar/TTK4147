@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include "array.h"
 
 void alloc_eight_gigs(void)
 {
@@ -30,11 +31,36 @@ void memset_eight_gigs(void) //segfault
     //difference between memory and swap is that the swap memory is a partition in the secondary memory.
 }
 
+
+
+//Yields segfault when a large enough area in memory is overwritten,
+//but does not yield segfault at smaller extensions of array
+void array_ovf(void)
+{
+    Array this_array = array_new(9);
+    for (int i = 0; i < 10; ++i)
+    {
+        ovf_array_insert_back(&this_array, i);
+    }
+    //new segfault when recompiled with -g -fsanitize=address
+    //but this time with segfault regardless of size of the allocated memory
+}
+
+void safe_insert_back(void)
+{
+    Array this_array = array_new(10);
+    for (int i = 0; i < 1000; ++i)
+    {
+        array_insert_back(&this_array, i);
+    }
+}
+
+
 int main(void)
 {
     //alloc_eight_gigs();
     //memset_eight_gigs();
-
+    //array_ovf();
+    safe_insert_back();
     return 0;
 }
-
