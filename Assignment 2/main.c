@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "array.h"
+#include <stdio.h>
+#include <unistd.h>
 
 void alloc_eight_gigs(void)
 {
@@ -48,9 +50,17 @@ void array_ovf(void)
 
 void safe_insert_back(void)
 {
-    Array this_array = array_new(10);
-    for (int i = 0; i < 1000; ++i)
+    Array this_array = array_new(1);
+    int prev_array_size = 1;
+    printf("starting array size: %d \n", prev_array_size);
+    for (int i = 0; i < 300000; ++i)
     {
+        if(prev_array_size < this_array.capacity)
+        {
+            printf("new array size: %ld \n", this_array.capacity);
+            prev_array_size = this_array.capacity;
+            sleep(1);
+        }
         array_insert_back(&this_array, i);
     }
 }
@@ -61,6 +71,6 @@ int main(void)
     //alloc_eight_gigs();
     //memset_eight_gigs();
     //array_ovf();
-    safe_insert_back();
+    //safe_insert_back();
     return 0;
 }
