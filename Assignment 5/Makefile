@@ -8,7 +8,7 @@ TARGET = prog
 CFLAGS = -g -Wall -std=gnu11 -lpthread -lcomedi -lm
 
 #linker flags
-LDFLAGS = -lpthread -lcomedi -lm
+LDFLAGS = -lpthread -lcomedi 
 
 #end flags
 ENDFLAGS = -lm
@@ -31,7 +31,7 @@ $(TARGET): $(OBJECTS)
 
 #compile 
 %.o : %.c $(DEPS)
-	gcc $(CFLAGS) -fsanitize=address -std=gnu11 -c -o  $@ $<
+	gcc $(CFLAGS) -fsanitize=address -c -o  $@ $<
 
 #cleaning 
 clean:
