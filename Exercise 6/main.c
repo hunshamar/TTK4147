@@ -94,8 +94,8 @@ void task_A_I()
     RT_TASK A;
     RT_TASK B;
     RT_TASK C;
-    rt_task_create(&A, "pollingA", 0, 0, T_CPU(1)):
-    rt_task_create(&B, "pollingB", 0, 0, T_CPU(1)):
+    rt_task_create(&A, "pollingA", 0, 0, T_CPU(1));
+    rt_task_create(&B, "pollingB", 0, 0, T_CPU(1));
     rt_task_create(&C, "pollingC", 0, 0, T_CPU(1));
     rt_task_start(&A, read_and_return, (&((struct responseTaskArgs){{1}})));
     rt_task_start(&B, read_and_return, (&((struct responseTaskArgs){{2}})));
@@ -127,8 +127,8 @@ void task_A_II()
     pthread_create(&VIII, NULL, redundant_task, NULL);
     pthread_create(&IX, NULL, redundant_task, NULL);
     pthread_create(&X, NULL, redundant_task, NULL);
-    rt_task_create(&A, "pollingA", 0, 0, T_CPU(1)):
-    rt_task_create(&B, "pollingB", 0, 0, T_CPU(1)):
+    rt_task_create(&A, "pollingA", 0, 0, T_CPU(1));
+    rt_task_create(&B, "pollingB", 0, 0, T_CPU(1));
     rt_task_create(&C, "pollingC", 0, 0, T_CPU(1));
     rt_task_start(&A, read_and_return, (&((struct responseTaskArgs){{1}})));
     rt_task_start(&B, read_and_return, (&((struct responseTaskArgs){{2}})));
@@ -155,8 +155,8 @@ void task_B()
     rt_task_set_periodic(&A, TM_NOW, period);
     rt_task_set_periodic(&B, TM_NOW, period);
     rt_task_set_periodic(&C, TM_NOW, period);
-    rt_task_create(&A, "pollingA", 0, 50, T_CPU(1)):
-    rt_task_create(&B, "pollingB", 0, 50, T_CPU(1)):
+    rt_task_create(&A, "pollingA", 0, 50, T_CPU(1));
+    rt_task_create(&B, "pollingB", 0, 50, T_CPU(1));
     rt_task_create(&C, "pollingC", 0, 50, T_CPU(1));
     rt_task_start(&A, read_and_return, (&((struct responseTaskArgs){{1}})));
     rt_task_start(&B, read_and_return, (&((struct responseTaskArgs){{2}})));
