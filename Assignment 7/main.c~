@@ -20,10 +20,7 @@ int set_cpu(int cpu_number){
 	return pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpu);
 }
 
-void task_A()
-{
-	
-}
+
 
 unsigned long duration = 10000000000;  // 10 second timeout
 unsigned long endTime = rt_timer_read() + duration;

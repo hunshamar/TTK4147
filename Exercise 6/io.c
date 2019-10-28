@@ -1,4 +1,6 @@
 #include "io.h"
+#include <rtdk.h>
+
 
 static comedi_t *it_g = NULL;
 
@@ -41,14 +43,13 @@ void io_write(int channel, int value)
     }
     else
     {
-        printf("Incorrect io channel\n");
+        printf("Incorrect io channel\n io channel: %d\n", channel);
     }
 }
 
 int io_read(int channel)
 {
     unsigned int data=0;
-
     if(channel >= 1 && channel <= 3)
     {
         comedi_dio_read(it_g, IO_DEV, DI(channel), &data);
@@ -56,7 +57,7 @@ int io_read(int channel)
     }
     else
     {
-        printf("Incorrect io channel\n");
+        printf("Incorrect io channel\n io channel: %d\n", channel);
         return -1;
     }
 
