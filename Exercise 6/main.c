@@ -155,9 +155,9 @@ void task_B()
     rt_task_set_periodic(&A, TM_NOW, period);
     rt_task_set_periodic(&B, TM_NOW, period);
     rt_task_set_periodic(&C, TM_NOW, period);
-    rt_task_create(&A, "pollingA", 0, 0, T_CPU(1)):
-    rt_task_create(&B, "pollingB", 0, 0, T_CPU(1)):
-    rt_task_create(&C, "pollingC", 0, 0, T_CPU(1));
+    rt_task_create(&A, "pollingA", 0, 50, T_CPU(1)):
+    rt_task_create(&B, "pollingB", 0, 50, T_CPU(1)):
+    rt_task_create(&C, "pollingC", 0, 50, T_CPU(1));
     rt_task_start(&A, read_and_return, (&((struct responseTaskArgs){{1}})));
     rt_task_start(&B, read_and_return, (&((struct responseTaskArgs){{2}})));
     rt_task_start(&C, read_and_return, (&((struct responseTaskArgs){{3}})));
