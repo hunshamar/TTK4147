@@ -71,6 +71,6 @@ int main(void)
     //alloc_eight_gigs();
     //memset_eight_gigs();
     //array_ovf();
-    //safe_insert_back();
+    safe_insert_back();
     return 0;
 }
